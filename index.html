@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="google" content="notranslate" />
+  <title>YouTube Views Booster</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 1200px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: #ff6b6b;
+      text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    }
+    form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    input {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      background: #ff6b6b;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ff4040;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      max-height: 75vh;
+      overflow-y: auto;
+      will-change: transform;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .video-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    .video-grid::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .video-grid::-webkit-scrollbar-thumb {
+      background: rgba(255, 107, 107, 0.5);
+      border-radius: 4px;
+    }
+    .video-box {
+      position: relative;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+      height: 140px;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    .video-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 10;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>YouTube Views Booster</h1>
+    <form id="videoForm">
+      <input type="url" id="videoUrl" placeholder="Enter YouTube Video URL" required />
+      <input type="number" id="views" placeholder="Desired Views (max 100)" required min="1" max="100" />
+      <button type="submit">Boost</button>
+    </form>
+    <div id="videoGrid" class="video-grid"></div>
+  </div>
+
+  <script>
+    document.getElementById('videoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const videoUrl = document.getElementById('videoUrl').value;
+      const views = parseInt(document.getElementById('views').value) || 1;
+      const videoId = extractVideoId(videoUrl);
+      const videoGrid = document.getElementById('videoGrid');
+      
+      if (!videoId) {
+        alert('Invalid YouTube URL. Please enter a valid YouTube video URL.');
+        return;
+      }
+      if (views < 1 || views > 100) {
+        alert('Please enter a number of views between 1 and 100.');
+        return;
+      }
+      videoGrid.innerHTML = '';
+      const batchSize = 50;
+      const totalBatches = Math.ceil(views / batchSize);
+      
+      function renderBatch(batchIndex) {
+        if (batchIndex >= totalBatches) return;
+        const start = batchIndex * batchSize;
+        const end = Math.min(start + batchSize, views);
+        for (let i = start; i < end; i++) {
+          const box = document.createElement('div');
+          box.className = 'video-box';
+          box.innerHTML = `
+            <iframe 
+              src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&controls=1&rel=0&loop=1&playlist=${videoId}&playsinline=1&disablekb=1&modestbranding=1&origin=${window.location.origin}" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; background-play" 
+              allowfullscreen 
+              frameborder="0"
+              loading="lazy"
+              id="youtube-player-${i}"
+            ></iframe>`;
+          videoGrid.appendChild(box);
+        }
+        if (batchIndex < totalBatches - 1) {
+          setTimeout(() => renderBatch(batchIndex + 1), 50);
+        } else {
+          setTimeout(checkVideoPlayback, 500);
+        }
+      }
+      renderBatch(0);
+    });
+
+    function extractVideoId(url) {
+      if (!url) return null;
+      const regex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&?/]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    function loadYoutubeAPI() {
+      if (window.YT) return;
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    }
+
+    window.onYouTubeIframeAPIReady = function () {
+      console.log("YouTube API Ready");
+      ensureVideosArePlaying();
+    };
+
+    loadYoutubeAPI();
+
+    function checkVideoPlayback() {
+      ensureVideosArePlaying();
+    }
+
+    let players = [];
+
+    function ensureVideosArePlaying() {
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach((iframe, index) => {
+        try {
+          if (!players[index] && iframe.contentWindow) {
+            players[index] = {
+              iframe: iframe,
+              contentWindow: iframe.contentWindow
+            };
+          }
+          if (players[index] && players[index].contentWindow) {
+            players[index].contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: 'playVideo',
+              args: []
+            }), '*');
+          }
+        } catch (e) {
+          console.log('Error controlling video:', e);
+        }
+      });
+    }
+
+    function forceVideoPlayback() {
+      ensureVideosArePlaying();
+      const currentTime = Date.now();
+      if (!window.lastFullRefresh || currentTime - window.lastFullRefresh > 30000) {
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+          try {
+            let src = iframe.src;
+            if (src.includes('&_t=')) {
+              if (!src.includes('autoplay=1')) {
+                src = src.replace(/autoplay=0/g, 'autoplay=1');
+                iframe.src = src;
+              }
+            } else {
+              src += '&autoplay=1';
+              iframe.src = src;
+            }
+          } catch (e) {
+            console.log('Unable to update video:', e);
+          }
+        });
+        window.lastFullRefresh = currentTime;
+      }
+    }
+
+    let isPageHidden = false;
+    let playbackInterval;
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        isPageHidden = true;
+        startBackgroundPlaybackMonitor();
+      } else {
+        isPageHidden = false;
+        checkVideoPlayback();
+        if (playbackInterval) {
+          clearInterval(playbackInterval);
+          playbackInterval = null;
+        }
+      }
+    });
+
+    function startBackgroundPlaybackMonitor() {
+      if (playbackInterval) clearInterval(playbackInterval);
+      playbackInterval = setInterval(() => {
+        if (isPageHidden) forceVideoPlayback();
+        else {
+          clearInterval(playbackInterval);
+          playbackInterval = null;
+        }
+      }, 30000);
+    }
+
+    function keepAlive() {
+      let counter = 0;
+      setInterval(() => {
+        counter++;
+        if (counter % 30 === 0 && isPageHidden) {
+          ensureVideosArePlaying();
+        }
+      }, 1000);
+    }
+
+    keepAlive();
+
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.addedNodes.length) {
+          setTimeout(checkVideoPlayback, 500);
+        }
+      });
+    });
+
+    observer.observe(document.getElementById('videoGrid'), {
+      childList: true,
+      subtree: true
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+      if (document.querySelectorAll('iframe').length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    });
+  </script>
+</body>
+</html>
