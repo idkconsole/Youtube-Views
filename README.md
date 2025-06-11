@@ -1,21 +1,22 @@
-# YouTube View Pump
+# 🎥 YouTube View Pump
 
-Web tool that boosts YouTube video views by running multiple instances at once. Just paste your link and choose how many players (up to 100) you want. Works even with browser minimized - perfect for content creators looking to bump their numbers.
+Boost your YouTube video views by simulating multiple view sessions directly from your browser. This lightweight tool runs entirely in HTML, CSS, and JavaScript—no backend required.
 
 ## Features
 
 - Run up to 100 YouTube video instances simultaneously
-- Background playback support (continues playing when browser is minimized)
-- Simple and clean user interface
-- Lightweight implementation with vanilla JavaScript
-- No external dependencies required
+- Background playback support (works even when minimized)
+- Clean and simple user interface
+- No external libraries or dependencies
+- Works directly from your browser (just open `index.html`)
 
 ## Usage
 
-1. Clone the repository
-2. Run `python main.py`
-3. Enter a YouTube URL and desired number of views
-4. Click "Boost" to start playing multiple instances
+1. Download or clone this repository
+2. Open `index.html` in your browser
+3. Paste your YouTube video link
+4. Choose the number of views (1–100)
+5. Click **Boost** to start the view pump
 
 ## Disclaimer
 
